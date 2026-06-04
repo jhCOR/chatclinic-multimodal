@@ -1,0 +1,107 @@
+{
+  "dataset": {
+    "total": 100,
+    "by_category": {
+      "ChestPA": {
+        "Normal": 25,
+        "Abnormal": 25
+      },
+      "Foot": {
+        "Normal": 25,
+        "Abnormal": 25
+      }
+    },
+    "by_finding": {
+      "ChestPA_Normal": 25,
+      "Foot_Hallux_Valgus": 9,
+      "Foot_Normal": 25,
+      "Foot_Flat_Foot": 8,
+      "ChestPA_Abnormal": 25,
+      "Foot_Plantar": 8
+    }
+  },
+  "model": "gpt-5-mini",
+  "conditions": [
+    "baseline",
+    "plain_grid",
+    "labeled_grid",
+    "bone_mesh"
+  ],
+  "metrics": {
+    "baseline": {
+      "n": 100,
+      "n_valid": 100,
+      "n_unparsed": 0,
+      "accuracy": 0.75,
+      "precision": 0.931,
+      "recall": 0.54,
+      "f1": 0.6835,
+      "tp": 27,
+      "tn": 48,
+      "fp": 2,
+      "fn": 23,
+      "per_category_accuracy": {
+        "ChestPA": 0.8,
+        "Foot": 0.7
+      }
+    },
+    "plain_grid": {
+      "n": 100,
+      "n_valid": 100,
+      "n_unparsed": 0,
+      "accuracy": 0.67,
+      "precision": 0.9048,
+      "recall": 0.38,
+      "f1": 0.5352,
+      "tp": 19,
+      "tn": 48,
+      "fp": 2,
+      "fn": 31,
+      "per_category_accuracy": {
+        "ChestPA": 0.76,
+        "Foot": 0.58
+      }
+    },
+    "labeled_grid": {
+      "n": 100,
+      "n_valid": 100,
+      "n_unparsed": 0,
+      "accuracy": 0.77,
+      "precision": 0.8857,
+      "recall": 0.62,
+      "f1": 0.7294,
+      "tp": 31,
+      "tn": 46,
+      "fp": 4,
+      "fn": 19,
+      "per_category_accuracy": {
+        "ChestPA": 0.94,
+        "Foot": 0.6
+      }
+    },
+    "bone_mesh": {
+      "n": 100,
+      "n_valid": 100,
+      "n_unparsed": 0,
+      "accuracy": 0.61,
+      "precision": 0.7619,
+      "recall": 0.32,
+      "f1": 0.4507,
+      "tp": 16,
+      "tn": 45,
+      "fp": 5,
+      "fn": 34,
+      "per_category_accuracy": {
+        "ChestPA": 0.68,
+        "Foot": 0.54
+      }
+    }
+  },
+  "n_api_errors": 0,
+  "montages": [
+    "/home/jihyeok/chatclinic-multimodal/benchmarks/visual_prompt_xray/results/samples/ChestPA_Normal_ChestPA_Normal_00004499.png",
+    "/home/jihyeok/chatclinic-multimodal/benchmarks/visual_prompt_xray/results/samples/Foot_Hallux_Valgus_Foot_Hallux_Valgus_00004096.png",
+    "/home/jihyeok/chatclinic-multimodal/benchmarks/visual_prompt_xray/results/samples/Foot_Normal_Foot_Normal_00004149.png",
+    "/home/jihyeok/chatclinic-multimodal/benchmarks/visual_prompt_xray/results/samples/ChestPA_Abnormal_ChestPA_Abnormal_00012944.png"
+  ]
+}
