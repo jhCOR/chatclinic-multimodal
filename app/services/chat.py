@@ -70,6 +70,8 @@ from plugins.snpeff_execution_tool.logic import run_snpeff
 from plugins.vcf_interpretation_tool.logic import execute as run_vcf_interpretation
 from plugins.vcf_qc_tool.logic import summarize_vcf
 from plugins.vcf_review_tool.logic import execute as run_vcf_review
+from plugins.visual_prompt_tool.logic import MODES as VISUAL_PROMPT_MODES
+from plugins.visual_prompt_tool.logic import execute as run_visual_prompt
 
 OPENAI_TIMEOUT_SECONDS = float(os.getenv("OPENAI_TIMEOUT_SECONDS", "45"))
 
@@ -1667,6 +1669,78 @@ def _execute_analysis_direct_vcf_review(
     )
 
 
+def _execute_image_direct_visual_prompt(
+    payload: ImageChatRequest,
+    tool_request: dict[str, object],
+    direct_chat: dict[str, Any],
+    options: dict[str, str],
+) -> ImageChatResponse:
+    del tool_request
+    image_path = (payload.analysis.source_image_path or "").strip()
+    if not image_path:
+        return ImageChatResponse(
+            source_type="image",
+            answer=(
+                "The active image session does not include a durable file path, "
+                "so `@visual_prompt` cannot run yet."
+            ),
+            citations=[],
+            used_fallback=True,
+        )
+
+    mode = (options.get("mode") or "labeled_grid").strip().lower()
+    if mode not in VISUAL_PROMPT_MODES:
+        return ImageChatResponse(
+            source_type="image",
+            answer=(
+                f"`@visual_prompt` mode `{mode}` is not recognized. "
+                f"Choose from: {', '.join(VISUAL_PROMPT_MODES)}."
+            ),
+            citations=[],
+            used_fallback=True,
+        )
+
+    tool_payload: dict[str, Any] = {"image_path": image_path, "mode": mode}
+    for key in ("grid_n", "mesh_spacing"):
+        raw = options.get(key)
+        if raw:
+            try:
+                tool_payload[key] = int(raw)
+            except ValueError:
+                pass
+
+    result = run_visual_prompt(tool_payload)
+    overlay_url = result.get("preview_data_url")
+    stats = result.get("stats") or {}
+
+    updated_analysis = payload.analysis.model_copy(update={
+        "preview_data_url": overlay_url or payload.analysis.preview_data_url,
+        "used_tools": list(payload.analysis.used_tools or []) + ["visual_prompt_tool"],
+    })
+
+    stats_lines = (
+        "\n".join(f"- {key}: {value}" for key, value in stats.items())
+        if stats
+        else "- (no additional stats for this mode)"
+    )
+    answer = (
+        f"Visual prompt overlay applied to `{result.get('file_name', payload.analysis.file_name)}` "
+        f"in `{mode}` mode.\n\n"
+        f"{stats_lines}\n\n"
+        "The Studio Image Review card now shows the overlaid image."
+    )
+    return ImageChatResponse(
+        source_type="image",
+        answer=answer,
+        citations=[],
+        used_fallback=False,
+        used_tools=["visual_prompt_tool"],
+        analysis=updated_analysis,
+        requested_view=str(direct_chat.get("requested_view") or "image_review"),
+        studio={"renderer": "image_review"},
+    )
+
+
 DIRECT_TOOL_ENDPOINT_EXECUTORS: dict[str, dict[str, Any]] = {
     "vcf": {
         "liftover": _execute_analysis_direct_liftover,
@@ -1685,6 +1759,9 @@ DIRECT_TOOL_ENDPOINT_EXECUTORS: dict[str, dict[str, Any]] = {
     },
     "text": {},
     "spreadsheet": {},
+    "image": {
+        "visual_prompt": _execute_image_direct_visual_prompt,
+    },
 }
 
 

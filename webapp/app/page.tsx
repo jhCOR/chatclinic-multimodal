@@ -2452,8 +2452,41 @@ export default function Page() {
     }
 
     // No frontend handler matched — if an analysis is loaded, let the backend chat handler try
+    const toolCommand = `@${alias}${remainder ? " " + remainder : ""}`;
     if (analysis) {
-      await handleAskAnalysisQuestion(`@${alias}${remainder ? " " + remainder : ""}`, analysis);
+      await handleAskAnalysisQuestion(toolCommand, analysis);
+      return;
+    }
+    if (imageAnalysis) {
+      await handleAskImageQuestion(toolCommand, imageAnalysis);
+      return;
+    }
+    if (dicomAnalysis) {
+      await handleAskDicomQuestion(toolCommand, dicomAnalysis);
+      return;
+    }
+    if (textAnalysis) {
+      await handleAskTextQuestion(toolCommand, textAnalysis);
+      return;
+    }
+    if (spreadsheetAnalysis) {
+      await handleAskSpreadsheetQuestion(toolCommand, spreadsheetAnalysis);
+      return;
+    }
+    if (niftiAnalysis) {
+      await handleAskNiftiQuestion(toolCommand, niftiAnalysis);
+      return;
+    }
+    if (fhirAnalysis) {
+      await handleAskFhirQuestion(toolCommand, fhirAnalysis);
+      return;
+    }
+    if (rawQcAnalysis) {
+      await handleAskRawQcQuestion(toolCommand, rawQcAnalysis);
+      return;
+    }
+    if (summaryStatsAnalysis) {
+      await handleAskSummaryStatsQuestion(toolCommand, summaryStatsAnalysis);
       return;
     }
     addMessage({

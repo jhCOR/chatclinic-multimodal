@@ -6,6 +6,8 @@
   "modality": "image",
   "source": "plugin",
   "direct_chat": {
+    "endpoint": "visual_prompt",
+    "argument_mode": "mode_or_key_value",
     "response_kind": "image_chat",
     "result_kind": "image_analysis",
     "requested_view": "image_review",
@@ -18,5 +20,19 @@
   },
   "source_types": [
     "image"
-  ]
+  ],
+  "help": {
+    "summary": "Overlay a visual prompt on the active X-ray image (grid / labeled grid / bone mesh).",
+    "options": [
+      "mode=labeled_grid|plain_grid|bone_mesh|baseline (default labeled_grid)",
+      "grid_n=<int> grid cells per side (grid modes, default 8)",
+      "mesh_spacing=<int> mesh line spacing in px (bone_mesh, default 22)"
+    ],
+    "examples": [
+      "@visual_prompt",
+      "@visual_prompt mode=bone_mesh",
+      "@visual_prompt mode=labeled_grid grid_n=10",
+      "@visual_prompt help"
+    ]
+  }
 }
