@@ -19,7 +19,8 @@ Upload a source file to get started. Supported formats: DICOM images, PNG/JPG/TI
 - Auto: DICOM Review (metadata, series summary, preview)
 
 **PNG / JPG / TIFF Image**
-- Auto: Image Review (metadata, EXIF, thumbnail)
+- `@xray_grounding [save_annotated=true]` — GPT-4o chest X-ray analysis with visual grounding of abnormal findings
+- Auto: Image Review (metadata, EXIF, thumbnail). For chest X-rays, route to X-ray Grounding instead.
 
 **NIfTI Volume (.nii, .nii.gz)**
 - Auto: NIfTI Review (shape, voxel dimensions, orientation, 3D viewer via Niivue)
@@ -127,6 +128,9 @@ Later tools should include:
 - Use `clinical_coverage_tool` to summarize annotation completeness.
 - Use `filtering_view_tool` to populate filtering/triage overview metrics for the variant table.
 - Use `symbolic_alt_tool` to split symbolic ALT records into a dedicated review path.
+- Use `xray_grounding_tool` for chest X-ray (PNG/JPG) images, or when the user mentions "x-ray", "xray", "chest", "cxr", "radiology", or asks to "analyze", "review", "detect", or "ground" an image. It returns `abnormal`, `impression`, `findings`, and `bounding_boxes`; when `abnormal=true`, the annotated image renders in the `image_review` Studio viewer.
+- For a DICOM source, run `dicom_review_tool` first, then offer `xray_grounding_tool` if the image is a chest X-ray.
+- Use `image_review_tool` (not `xray_grounding_tool`) for generic, non-radiograph images where only metadata/EXIF review is needed.
 - Chat should refer to tool outputs and Studio summaries as the trusted state.
 - If a tool fails, preserve the prior direct implementation as fallback until migration is complete.
 

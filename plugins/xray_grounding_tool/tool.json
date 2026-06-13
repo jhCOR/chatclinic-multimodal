@@ -1,0 +1,75 @@
+{
+  "name": "xray_grounding_tool",
+  "entrypoint": "plugins.xray_grounding_tool.logic:execute",
+  "description": "Analyzes chest X-ray images using GPT-4o vision. Detects abnormal findings (e.g., consolidation, pleural effusion, pneumothorax) and draws visual grounding bounding boxes on the regions of interest.",
+  "task": "xray-analysis",
+  "modality": "medical-image",
+  "source": "plugin",
+  "source_types": ["image"],
+  "initial_for": ["image"],
+  "direct_chat": {
+    "endpoint": "xray_grounding",
+    "source_type": "image",
+    "response_kind": "image_chat",
+    "result_kind": "xray_analysis",
+    "requested_view": "image_review",
+    "studio": {
+      "renderer": "image_review"
+    }
+  },
+  "routing": {
+    "trigger_keywords": ["xray", "x-ray", "chest", "radiology", "cxr", "grounding"],
+    "execution_intents": ["analyze", "review", "detect", "find", "ground"],
+    "requires_source_vcf": false,
+    "question_argument": "none",
+    "result_slot": "xray_grounding_result",
+    "execution_mode": "direct_endpoint"
+  },
+  "orchestration": {
+    "tool_kind": "execution",
+    "default_stage": "image-analysis",
+    "consumes": ["image_path"],
+    "produces": ["xray_grounding_result"],
+    "priority": 80,
+    "on_demand": true
+  },
+  "runtime": {
+    "host_compatible": ["cpu", "gpu"],
+    "requires_gpu": false,
+    "allow_cpu_fallback": true,
+    "estimated_runtime_sec": 15
+  },
+  "approval_required": false,
+  "help": {
+    "summary": "GPT-4o chest X-ray analysis with visual grounding of abnormal findings.",
+    "modes": [
+      {
+        "name": "analyze",
+        "description": "Analyze chest X-ray and annotate abnormal regions with bounding boxes."
+      }
+    ],
+    "options": [
+      {
+        "name": "image_path",
+        "type": "string",
+        "required": true,
+        "description": "Path to the chest X-ray image (JPG or PNG)."
+      },
+      {
+        "name": "save_annotated",
+        "type": "bool",
+        "required": false,
+        "description": "If true, saves annotated image to outputs/. Default: true."
+      }
+    ],
+    "examples": [
+      "@xray_grounding image_path=/path/to/cxr.jpg",
+      "@xray_grounding image_path=/path/to/cxr.jpg save_annotated=false"
+    ],
+    "notes": [
+      "Requires OPENAI_API_KEY environment variable.",
+      "Uses GPT-4o vision for abnormality detection and coordinate prediction.",
+      "Bounding boxes are drawn only when abnormal findings are detected."
+    ]
+  }
+}
